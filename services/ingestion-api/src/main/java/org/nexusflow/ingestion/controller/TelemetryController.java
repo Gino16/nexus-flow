@@ -1,0 +1,22 @@
+package org.nexusflow.ingestion.controller;
+
+import com.nexusflow.ingestion.api.TelemetraApi;
+import com.nexusflow.ingestion.model.TelemetryRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
+import java.util.concurrent.CompletionStage;
+import org.nexusflow.ingestion.service.TelemetryService;
+
+@ApplicationScoped
+public class TelemetryController implements TelemetraApi {
+
+  @Inject
+  TelemetryService telemetryService;
+
+  @Override
+  public CompletionStage<Response> ingestTelemetry(TelemetryRequest telemetryRequest) {
+    return telemetryService.ingestTelemetry(telemetryRequest)
+        .subscribeAsCompletionStage();
+  }
+}

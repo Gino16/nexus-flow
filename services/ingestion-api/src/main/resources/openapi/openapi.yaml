@@ -1,0 +1,115 @@
+openapi: 3.0.3
+info:
+  title: NexusFlow Ingestion API
+  description: >
+    API de alta disponibilidad para la ingesta de telemetría. 
+    Soporta validación JWT via Keycloak, Rate Limiting y persistencia reactiva.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+    description: Servidor de desarrollo local
+
+paths:
+  /api/v1/telemetry:
+    post:
+      tags:
+        - Telemetría
+      summary: Enviar lectura de dispositivo
+      operationId: ingestTelemetry
+      security:
+        - KeycloakAuth: [ "telemetry-write" ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryRequest'
+      responses:
+        '202':
+          description: Evento aceptado y encolado en Kafka.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionResponse'
+        '400':
+          description: Datos inválidos o formato incorrecto.
+        '401':
+          description: Token JWT no proporcionado o inválido.
+        '429':
+          description: Demasiadas peticiones (Rate Limit excedido).
+
+components:
+  securitySchemes:
+    KeycloakAuth:
+      type: oauth2
+      description: Autenticación JWT vía Keycloak (OpenID Connect)
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8080/realms/NexusFlow/protocol/openid-connect/token
+          scopes:
+            telemetry-write: Permiso para enviar datos de sensores
+
+  schemas:
+    TelemetryRequest:
+      type: object
+      required: [deviceId, metadata, data]
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        metadata:
+          $ref: '#/components/schemas/EventMetadata'
+        data:
+          type: object
+          description: Mapa dinámico de lecturas del sensor
+          additionalProperties: true
+          example:
+            temperature: 24.5
+            humidity: 60.1
+            status: "OK"
+        location:
+          $ref: '#/components/schemas/Location'
+
+    EventMetadata:
+      type: object
+      required: [id, time]
+      properties:
+        id:
+          type: string
+          description: UUID único del mensaje para control de duplicados
+          example: "msg-998877"
+        time:
+          type: string
+          format: date-time
+          description: Timestamp original del sensor (ISO 8601)
+          example: "2025-05-20T14:30:00Z"
+        source:
+          type: string
+          example: "/sensors/factory-a/line-1"
+
+    Location:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+        lon:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+
+    IngestionResponse:
+      type: object
+      properties:
+        traceId:
+          type: string
+          description: ID de correlación para seguimiento en logs
+          example: "tx-554433"
+        message:
+          type: string
+          example: "Event accepted"
