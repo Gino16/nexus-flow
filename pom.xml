@@ -37,6 +37,7 @@
 
   <modules>
     <module>services/ingestion-api</module>
+    <module>services/analytics-api</module>
 <!--    <module>services/generator-service</module>-->
 <!--    <module>services/analytics-engine</module>-->
   </modules>

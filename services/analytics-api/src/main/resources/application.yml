@@ -1,0 +1,22 @@
+quarkus:
+  http:
+    port: 8082
+  devservices:
+    enabled: false
+
+kafka:
+  bootstrap:
+    servers: localhost:9092
+
+mp:
+  messaging:
+    incoming:
+      telemetry-in:
+        connector: smallrye-kafka
+        topic: raw-telemetry
+        group.id: analytics-group
+        value:
+          deserializer: io.vertx.kafka.client.serialization.JsonObjectDeserializer
+        auto:
+          offset:
+            reset: earliest
