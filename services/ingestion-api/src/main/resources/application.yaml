@@ -1,5 +1,4 @@
 quarkus:
-  # 1. Configuración de Base de Datos (PostgreSQL Reactivo)
   datasource:
     db-kind: postgresql
     username: user
@@ -12,21 +11,18 @@ quarkus:
     log:
       sql: true
 
-  # 2. Caché y Rate Limit (Redis)
   redis:
     hosts: redis://localhost:6379
     client-type: standalone
 
-  # 3. Seguridad (Keycloak OIDC)
   oidc:
     auth-server-url: http://localhost:8080/realms/NexusFlow
     client-id: ingestion-api
     credentials:
-      secret: secret-que-obtendremos-de-keycloak
+      secret: nexus-flow-very-secret-key-123
     roles:
       role-claim-path: realm_access/roles
 
-  # 4. Java 21 & Observabilidad
   vertx:
     use-virtual-threads: true
   micrometer:
@@ -34,8 +30,9 @@ quarkus:
     export:
       prometheus:
         path: /metrics
+  http:
+    port: 8081
 
-# 5. Mensajería (Kafka)
 kafka:
   bootstrap:
     servers: localhost:9092

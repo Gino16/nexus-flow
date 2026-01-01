@@ -71,6 +71,20 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-validator</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-config-yaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-kafka-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.30</version> <!-- Use the latest version -->
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -91,8 +105,8 @@
             <configuration>
               <inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
               <generatorName>jaxrs-spec</generatorName>
-              <apiPackage>com.nexusflow.ingestion.api</apiPackage>
-              <modelPackage>com.nexusflow.ingestion.model</modelPackage>
+              <apiPackage>com.nexusflow.ingestion.generated.api</apiPackage>
+              <modelPackage>com.nexusflow.ingestion.generated.model</modelPackage>
               <configOptions>
                 <useJakartaEe>true</useJakartaEe>
                 <interfaceOnly>true</interfaceOnly>
